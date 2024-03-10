@@ -1,1 +1,1 @@
-# React App for Tick Tack Toe. 
+# React App for Tick Tack Toe
