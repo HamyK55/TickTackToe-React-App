@@ -80,14 +80,38 @@ function calculateWinner(squares) {
 }
 
 export default function Game() {
-  const [OIsNext, setOIsNext] = useState(false);
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquares = history[history.length - 1];
+  const [currentMove, setCurrentMove] = useState(0);
+  const OIsNext = currentMove % 2 === 1;
+  const currentSquares = history[currentMove];
+  
 
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares]); // appends latest game state to history
-    setOIsNext(!OIsNext);
+    // when time traveling we only want to keep history uptill the current game state, then add new state
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares]; 
+    setHistory(nextHistory);
+
+    setCurrentMove(currentMove+1);
   }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
+
+  // react component maps an element of history with button
+  const moves = history.map((square, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
 
 
   return (
@@ -96,7 +120,7 @@ export default function Game() {
         <Board OIsNext={OIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
